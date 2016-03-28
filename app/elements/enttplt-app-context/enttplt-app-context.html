@@ -1,0 +1,124 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="enttplt-app-context">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host #appMainContainer {
+        @apply(--layout-fullbleed);
+        @apply(--layout-vertical);
+      }
+
+      :host .app-preloader {
+        @apply(--layout-fullbleed);
+        @apply(--layout-vertical);
+      }
+    </style>
+    <!--<enttplt-app-globals on-auth-status-changed="_onAuthStatusChanged"></enttplt-app-globals>-->
+    <enttplt-app-globals></enttplt-app-globals>
+    <div id="appMainContainer">
+      <enttplt-app-preloader id="appPreloader" class="app-preloader"></enttplt-app-preloader>
+    </div>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        is: 'enttplt-app-context',
+
+        /* Properties */
+        properties: {
+          baseUrl: {
+            type: String,
+            value: '/'
+          },
+
+          route: {
+            type: String,
+            observer: '_routeChanged'
+          },
+        },
+
+        _routeChanged: function(newValue) {
+          var appMainElement = this.querySelector('enttplt-app-main');
+
+          if (appMainElement) {
+            appMainElement.route = newValue;
+          }
+        },
+
+        /* Properties */
+        get appMainContainerElement() {
+          return this.$.appMainContainer;
+        },
+
+        attached: function() {
+          var newContentElement = this._createAppMainElement();
+          this._switchContentTo(newContentElement);
+        },
+
+        /* Private methods */
+        _disposeAllAppContents: function() {
+          this._disposePreloader();
+          while (this.appMainContainerElement.hasChildNodes()) {
+            this.appMainContainerElement.removeChild(this.appMainContainerElement.lastChild);
+          }
+        },
+
+        _disposePreloader: function() {
+          if (this.$.appPreloader) {
+            this.appMainContainerElement.removeChild(this.$.appPreloader);
+            this.$.appPreloader = null;
+          }
+        },
+
+        _createWelcomeElement: function() {
+          return this.create('enttplt-app-welcome', {});
+        },
+
+        _createAppMainElement: function() {
+          var appMain = this.create('enttplt-app-main', {
+            baseUrl: this.baseUrl,
+            route: this.route,
+            params: this.params,
+            loggedUserProfile: (window.appGlobals) ? window.appGlobals.userProfile : {},
+          });
+
+          var that = this;
+          appMain.addEventListener('route-changed', function(e) {
+            that.route = e.detail.value;
+          });
+
+          appMain.addEventListener('params-changed', function(e) {
+            that.params = e.detail.value;
+          });
+
+          return appMain;
+        },
+
+        _switchContentTo: function(newElement) {
+          this._disposeAllAppContents();
+          this.appMainContainerElement.appendChild(newElement);
+        },
+
+        /* Events */
+        _onAuthStatusChanged: function(e) {
+          console.debug('[_onAuthStatusChanged] - appGlobals.signedIn: ', window.appGlobals.signedIn, e);
+          this.debounce('_onAuthStatusChanged', function() {
+            this.async(function() {
+              var newContentElement = null;
+              if (window.appGlobals.signedIn) {
+                newContentElement = this._createAppMainElement();
+              } else {
+                newContentElement = this._createWelcomeElement();
+              }
+              this._switchContentTo(newContentElement);
+            });
+          }, 1000);
+        },
+      });
+    })();
+  </script>
+</dom-module>

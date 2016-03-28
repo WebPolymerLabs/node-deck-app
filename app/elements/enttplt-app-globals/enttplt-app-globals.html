@@ -1,0 +1,119 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/google-signin/google-signin.html">
+<link rel="import" href="../../bower_components/google-signin/google-signin-aware.html">
+
+<dom-module id="enttplt-app-globals">
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+    </style>
+    <google-signin-aware
+      id="googleSigninAware"
+      client-id="[[clientId]]"
+      scopes="{{scope}}"
+      signed-in="{{signedIn}}"
+      offline="{{offline}}"
+      is-authorized="{{isAuthorized}}"
+      need-additional-auth="{{needAdditionalAuth}}"
+      on-google-signin-aware-success="handleSignIn"
+      on-google-signin-offline-success="handleOffline"
+      on-google-signin-aware-signed-out="handleSignOut"></google-signin-aware>
+  </template>
+  <script>
+  (function() {
+    Polymer({
+      is: 'enttplt-app-globals',
+
+      properties: {
+        clientId: {
+          type: String,
+          value: '979428870903-3c4ifmsrlju8213kjip8g8iafc9mpg9m.apps.googleusercontent.com'
+        },
+        scope: {
+          type: String,
+          value: 'profile'
+        },
+        signedIn: {
+          type: Boolean,
+          value: undefined,
+          observer: '_signedInChanged'
+        },
+        isAuthorized: {
+          type: Boolean,
+          value: false
+        },
+        needAdditionalAuth: {
+          type: Boolean,
+          value: true
+        },
+        status: {
+          type: String,
+          value: 'Not granted'
+        },
+        offlineCode: {
+          type: String,
+          value: 'No offline login.'
+        },
+        userProfile: {
+          type: Object,
+          value: null
+        }
+      },
+
+      _fireAuthStatusChanged: function() {
+        this.fire('auth-status-changed', {});
+      },
+
+      _signedInChanged: function(newValue) {
+        console.log('[_signedInChanged]', new Date(), newValue);
+
+        if ((newValue !== undefined) && (newValue !== null)) {
+          this._fireAuthStatusChanged();
+        }
+      },
+
+      created: function() {
+        window.appGlobals = window.appGlobals || this;
+      },
+
+      ready: function() {
+        console.log('[ready]', new Date());
+      },
+
+      handleSignIn: function(response) {
+        this.status = 'Signin granted';
+        console.log('[Aware] Signin Response', response);
+        var userProfile = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile();
+        this.userProfile = {
+          name: userProfile.getName(),
+          avatar: {
+            url: userProfile.getImageUrl(),
+          },
+        };
+      },
+
+      handleOffline: function(response) {
+        this.offlineCode = response.detail.code;
+      },
+
+      handleSignOut: function(response) {
+        this.status = 'Signed out';
+        console.log('[Aware] Signout Response', response);
+        this.userProfile = null;
+      },
+
+      disconnect: function() {
+        //var b = document.querySelector('google-signin');
+        var currentUser = gapi.auth2.getAuthInstance().currentUser.get();
+        if (currentUser) {
+          currentUser.disconnect();
+        }
+        gapi.auth2.getAuthInstance().signOut();
+      },
+    });
+  })();
+  </script>
+</dom-module>

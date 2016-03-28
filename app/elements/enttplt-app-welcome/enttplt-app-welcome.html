@@ -1,0 +1,40 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/google-signin/google-signin.html">
+
+<dom-module id="enttplt-app-welcome">
+  <template>
+    <style>
+      :host {
+        display: block;
+        background-image: url("/images/landing-background-image.jpg");
+        background-repeat: no-repeat;
+
+        @apply(--layout-flex);
+        @apply(--layout-vertical);
+        @apply(--layout-center-center);
+      }
+    </style>
+    <div class="landing-signin-container">
+      <google-signin id="googleSignin" brand="google" width="wide"></google-signin>
+    </div>
+  </template>
+  <script>
+  (function() {
+
+    Polymer({
+      is: 'enttplt-app-welcome',
+
+      properties: {
+      },
+
+      ready: function() {
+      },
+
+      attached: function() {
+        this.$.googleSignin.clientId = window.appGlobals.clientId;
+      },
+    });
+  })();
+  </script>
+</dom-module>
