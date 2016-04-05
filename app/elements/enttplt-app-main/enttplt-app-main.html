@@ -8,10 +8,9 @@
       :host {
         display: block;
       }
-
       /* Breakpoints */
       /* Small */
-
+      
       @media (max-width: 600px) {
         paper-material {
           --menu-container-display: none;
@@ -28,7 +27,7 @@
         }
       }
       /* Tablet+ */
-
+      
       @media (min-width: 601px) {
         paper-material {
           width: calc(98% - 46px);
@@ -52,52 +51,52 @@
                 http://www.google.com/design/spec/layout/adaptive-ui.html#adaptive-ui-breakpoints
             */
       /* mobile-small */
-
+      
       @media all and (min-width: 0) and (max-width: 360px) and (orientation: portrait) {}
       /* mobile-large */
-
+      
       @media all and (min-width: 361px) and (orientation: portrait) {}
       /* mobile-small-landscape */
-
+      
       @media all and (min-width: 0) and (max-width: 480px) and (orientation: landscape) {}
       /* mobile-large-landscape */
-
+      
       @media all and (min-width: 481px) and (orientation: landscape) {}
       /* tablet-small-landscape */
-
+      
       @media all and (min-width: 600px) and (max-width: 960px) and (orientation: landscape) {}
       /* tablet-large-landscape */
-
+      
       @media all and (min-width: 961px) and (orientation: landscape) {}
       /* tablet-small */
-
+      
       @media all and (min-width: 600px) and (orientation: portrait) {}
       /* tablet-large */
-
+      
       @media all and (min-width: 601px) and (max-width: 840px) and (orientation: portrait) {}
       /* desktop-x-small-landscape */
-
+      
       @media all and (min-width: 0) and (max-width: 480px) and (orientation: landscape) {}
       /* desktop-x-small */
-
+      
       @media all and (min-width: 0) and (max-width: 480px) and (max-aspect-ratio: 4/3) {}
       /* desktop-small-landscape */
-
+      
       @media all and (min-width: 481px) and (max-width: 840px) and (orientation: landscape) {}
       /* desktop-small */
-
+      
       @media all and (min-width: 481px) and (max-width: 840px) and (max-aspect-ratio: 4/3) {}
       /* desktop-medium-landscape */
-
+      
       @media all and (min-width: 841px) and (max-width: 1280px) and (orientation: landscape) {}
       /* desktop-medium */
-
+      
       @media all and (min-width: 841px) and (max-width: 1280px) and (max-aspect-ratio: 4/3) {}
       /* desktop-large */
-
+      
       @media all and (min-width: 1281px) and (max-width: 1600px) {}
       /* desktop-xlarge */
-
+      
       @media all and (min-width: 1601px) and (max-width: 1920px) {}
     </style>
     <paper-drawer-panel id="paperDrawerPanel">
@@ -111,11 +110,20 @@
 
         <!-- Drawer Content -->
         <paper-menu class="list" attr-for-selected="data-route" selected="[[route]]">
-          <a data-route="home" href="[[baseUrl]]">
+          <a data-route="home" href="/">
             <iron-icon icon="home"></iron-icon>
             <span>Home</span>
           </a>
         </paper-menu>
+
+        <paper-submenu label="Projects">
+          <paper-item class="menu-trigger">Properties</paper-item>
+          <paper-menu class="menu-content sublist2">
+            <a data-route="project-1" href="/project1">
+              <paper-item>opened</paper-item>
+            </a>
+          </paper-menu>
+        </paper-submenu>
       </paper-scroll-header-panel>
 
       <!-- Main Area -->
@@ -151,6 +159,12 @@
               </paper-material>
             </section>
 
+            <section data-route="project-1">
+              <paper-material elevation="1">
+                <p class="paper-font-body2">Project 01</p>
+              </paper-material>
+            </section>
+
           </iron-pages>
         </div>
       </paper-scroll-header-panel>
@@ -174,11 +188,15 @@
         -->
   </template>
   <script>
-  (function() {
+    (function() {
     Polymer({
       is: 'enttplt-app-main',
 
       properties: {
+        route: {
+          type: String,
+          notify: true
+        }
       },
     });
   })();

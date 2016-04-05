@@ -27,12 +27,18 @@
       next();
     });
 
-    page('/', function() {
+    page('/', function(ctx) {
+      console.log('route: /', ctx);
       app.$.appContext.route = 'home';
     });
 
     page(app.$.appContext.baseUrl, function() {
       app.$.appContext.route = 'home';
+    });
+
+    page('/project1', function(ctx) {
+      console.log('route: /project1', ctx);
+      app.$.appContext.route = 'project-1';
     });
 
     // 404

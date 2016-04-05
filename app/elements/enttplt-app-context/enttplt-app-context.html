@@ -43,7 +43,7 @@
 
         _routeChanged: function(newValue) {
           var appMainElement = this.querySelector('enttplt-app-main');
-
+          console.log('[_routeChanged]:', newValue, appMainElement);
           if (appMainElement) {
             appMainElement.route = newValue;
           }
