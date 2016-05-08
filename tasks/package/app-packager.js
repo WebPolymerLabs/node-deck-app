@@ -10,7 +10,7 @@ var utils = require('../utils');
 
 var buildPath = pathUtil.resolve('./build');
 var packageOutPath = pathUtil.resolve('./packages');
-var electronVersion = "0.37.2";
+var electronVersion = "0.37.8";
 
 var init = function (platform) {
   return Q(platform);
