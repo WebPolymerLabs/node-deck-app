@@ -103,7 +103,7 @@ import moment from 'moment';
 
 #### Including files to your project
 
-The build script copies files from `app` to `build` directory and the application is started from `build`. Therefore if you want to use any special file/folder in your app make sure it will be copied via some of glob patterns in `tasks/build.js`:
+The build script copies files from `app` to `build` directory and the application is started from `build`. Therefore if you want to use any special file/folder in your app make sure it will be copied via some of glob patterns in `tasks/build/build.js`:
 
 ```js
 var paths = {
@@ -118,12 +118,13 @@ var paths = {
 
 #### Unit tests
 
-electron-boilerplate has preconfigured [jasmine](http://jasmine.github.io/2.0/introduction.html) test runner. To run the tests go with standard:
+electron-boilerplate has preconfigured [mocha](https://mochajs.org/) test runner with the [chai](http://chaijs.com/api/assert/) assertion library. To run the tests go with standard:
 ```
 npm test
 ```
 You don't have to declare paths to spec files in any particular place. The runner will search through the project for all `*.spec.js` files and include them automatically.
 
+Those tests can be plugged into [continuous integration system](https://github.com/atom/electron/blob/master/docs/tutorial/testing-on-headless-ci.md).
 
 # Making a release
 
@@ -142,8 +143,42 @@ You can create Windows installer only when running on Windows, the same is true 
 #### App signing
 
 The Mac release supports [code signing](https://developer.apple.com/library/mac/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html). To sign the `.app` in the release image, include the certificate ID in the command as so,
-```
+```shell
 npm run release -- --sign A123456789
+```
+
+#### Mac App Store
+**CAUTION**: until [atom/electron/issues#3871](https://github.com/atom/electron/issues/3871) isn't resolved, the signing procedure probably will make your application crash right after run.
+
+You should install the Electron build for MAS
+```
+export npm_config_platform=mas
+rm -rf node_modules
+npm install
+```
+
+To sign your app for Mac App Store
+```shell
+npm run release -- --mas --mas-sign "3rd Party Mac Developer Application: Company Name (APPIDENTITY)" --mas-installer-sign "3rd Party Mac Developer Installer: Company Name (APPIDENTITY)"
+```
+
+Or edit the `app/package.json`, remove the `//` from `//codeSignIdentitiy` and update the values with your sign indentities
+```json
+  "//codeSignIdentitiy": {
+    "dmg": "Developer ID Application: Company Name (APPIDENTITY)",
+    "MAS": "3rd Party Mac Developer Application: Company Name (APPIDENTITY)",
+    "MASInstaller": "3rd Party Mac Developer Installer: Company Name (APPIDENTITY)"
+  }
+```
+
+You can change the application category too
+```json
+  "LSApplicationCategoryType": "public.app-category.productivity"
+```
+
+If you insert your indentities in the package.json you can compile for MAS like
+```
+npm run release -- --mas
 ```
 
 ## Windows only

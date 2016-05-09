@@ -4,6 +4,9 @@ var pathUtil = require('path');
 var Q = require('q');
 var gulp = require('gulp');
 var less = require('gulp-less');
+var watch = require('gulp-watch');
+var batch = require('gulp-batch');
+var plumber = require('gulp-plumber');
 var jetpack = require('fs-jetpack');
 
 var bundle = require('./bundle');
@@ -17,18 +20,18 @@ var destDir = projectDir.cwd('./build');
 var paths = {
     copyFromAppDir: [
         './node_modules/**',
+        './helpers/**',
         './platform/**',
-        './vendor/**',
         './**/*.html',
         './**/*.+(jpg|png|svg)'
     ],
-}
+};
 
 // -------------------------------------
 // Tasks
 // -------------------------------------
 
-gulp.task('clean', function (callback) {
+gulp.task('clean', function () {
     return destDir.dirAsync('.', { empty: true });
 });
 
@@ -52,10 +55,7 @@ var bundleApplication = function () {
 
 var bundleSpecs = function () {
     return generateSpecImportsFile().then(function (specEntryPointPath) {
-        return Q.all([
-                bundle(srcDir.path('background.js'), destDir.path('background.js')),
-                bundle(specEntryPointPath, destDir.path('spec.js')),
-            ]);
+        return bundle(specEntryPointPath, destDir.path('spec.js'));
     });
 };
 
@@ -71,6 +71,7 @@ gulp.task('bundle-watch', bundleTask);
 
 var lessTask = function () {
     return gulp.src('app/stylesheets/main.less')
+        .pipe(plumber())
         .pipe(less())
         .pipe(gulp.dest(destDir.path('stylesheets')));
 };
@@ -84,13 +85,9 @@ gulp.task('finalize', ['clean'], function () {
     // Add "dev" or "test" suffix to name, so Electron will write all data
     // like cookies and localStorage in separate places for each environment.
     switch (utils.getEnvName()) {
-        case 'DEV':
+        case 'development':
             manifest.name += '-dev';
             manifest.productName += ' Dev';
-            break;
-        case 'TST':
-            manifest.name += '-tst';
-            manifest.productName += ' TST';
             break;
         case 'test':
             manifest.name += '-test';
@@ -108,9 +105,15 @@ gulp.task('finalize', ['clean'], function () {
 
 
 gulp.task('watch', function () {
-    gulp.watch('app/**/*.js', ['bundle-watch']);
-    gulp.watch(paths.copyFromAppDir, { cwd: 'app' }, ['copy-watch']);
-    gulp.watch('app/**/*.less', ['less-watch']);
+    watch('app/**/*.js', batch(function (events, done) {
+        gulp.start('bundle-watch', done);
+    }));
+    watch(paths.copyFromAppDir, { cwd: 'app' }, batch(function (events, done) {
+        gulp.start('copy-watch', done);
+    }));
+    watch('app/**/*.less', batch(function (events, done) {
+        gulp.start('less-watch', done);
+    }));
 });
 
 

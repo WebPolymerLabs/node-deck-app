@@ -1,4 +1,5 @@
 // Simple module exposes environment variables to rest of the code.
+
 import jetpack from 'fs-jetpack';
 
 var app;
