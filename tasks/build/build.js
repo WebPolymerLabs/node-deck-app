@@ -2,12 +2,17 @@
 
 var pathUtil = require('path');
 var Q = require('q');
+var del = require('del');
 var gulp = require('gulp');
 var less = require('gulp-less');
 var watch = require('gulp-watch');
 var batch = require('gulp-batch');
 var plumber = require('gulp-plumber');
 var jetpack = require('fs-jetpack');
+var babel = require('gulp-babel');
+var flatten = require('gulp-flatten');
+
+var babelPluginModules = require('fbjs-scripts/babel-6/rewrite-modules');
 
 var bundle = require('./bundle');
 var generateSpecImportsFile = require('./generate_spec_imports');
@@ -19,11 +24,46 @@ var destDir = projectDir.cwd('./build');
 
 var paths = {
     copyFromAppDir: [
+        './bower_components/**',
         './node_modules/**',
         './helpers/**',
         './platform/**',
         './**/*.html',
         './**/*.+(jpg|png|svg)'
+    ],
+    react: {
+        src: [
+            './app/**/*.jsx',
+        ],
+        dest: 'app/',
+    },
+};
+
+var fbjsModuleMap = require('fbjs/module-map');
+var moduleMap = {};
+for (var key in fbjsModuleMap) {
+    moduleMap[key] = fbjsModuleMap[key];
+}
+var whiteListNames = [
+    'deepDiffer',
+    'deepFreezeAndThrowOnMutationInDev',
+    'flattenStyle',
+    'InitializeJavaScriptAppEngine',
+    'RCTEventEmitter',
+    'TextInputState',
+    'UIManager',
+    'View',
+];
+
+whiteListNames.forEach(function (name) {
+    moduleMap[name] = name;
+});
+
+moduleMap['object-assign'] = 'object-assign';
+
+var babelOpts = {
+    plugins: [
+        [babelPluginModules, { map: moduleMap }],
     ],
 };
 
@@ -35,22 +75,20 @@ gulp.task('clean', function () {
     return destDir.dirAsync('.', { empty: true });
 });
 
-
 var copyTask = function () {
     return projectDir.copyAsync('app', destDir.path(), {
-            overwrite: true,
-            matching: paths.copyFromAppDir
-        });
+        overwrite: true,
+        matching: paths.copyFromAppDir
+    });
 };
 gulp.task('copy', ['clean'], copyTask);
 gulp.task('copy-watch', copyTask);
 
-
 var bundleApplication = function () {
     return Q.all([
-            bundle(srcDir.path('background.js'), destDir.path('background.js')),
-            bundle(srcDir.path('app.js'), destDir.path('app.js')),
-        ]);
+        bundle(srcDir.path('background.js'), destDir.path('background.js')),
+        bundle(srcDir.path('app/main.js'), destDir.path('app/main.js')),
+    ]);
 };
 
 var bundleSpecs = function () {
@@ -78,6 +116,17 @@ var lessTask = function () {
 gulp.task('less', ['clean'], lessTask);
 gulp.task('less-watch', lessTask);
 
+gulp.task('react:clean', function() {
+  return del([destDir.path(paths.react.dest)]);
+});
+
+gulp.task('react:modules', function() {
+  return gulp
+    .src(paths.react.src)
+    .pipe(babel(babelOpts))
+    .pipe(flatten())
+    .pipe(gulp.dest(destDir.path(paths.react.dest)));
+});
 
 gulp.task('finalize', ['clean'], function () {
     var manifest = srcDir.read('package.json', 'json');
@@ -111,10 +160,13 @@ gulp.task('watch', function () {
     watch(paths.copyFromAppDir, { cwd: 'app' }, batch(function (events, done) {
         gulp.start('copy-watch', done);
     }));
+    watch('app/app/*.jsx', batch(function (events, done) {
+        gulp.start('react:modules', done);
+    }));
     watch('app/**/*.less', batch(function (events, done) {
         gulp.start('less-watch', done);
     }));
 });
 
 
-gulp.task('build', ['bundle', 'less', 'copy', 'finalize']);
+gulp.task('build', ['bundle', 'less', 'copy', 'react:modules', 'finalize']);

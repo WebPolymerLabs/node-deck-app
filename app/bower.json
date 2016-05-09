@@ -1,0 +1,23 @@
+{
+  "name": "node-deck-app",
+  "description": "Node Deck.",
+  "main": "background.js",
+  "authors": [
+    "Vinicius Patrinhani"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/patrinhani-ciandt/node-deck-app",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "lodash": "~4.6.1",
+    "jquery": "~2.2.2",
+    "react": "^15.0.2"
+  }
+}

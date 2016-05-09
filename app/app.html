@@ -5,8 +5,6 @@
     <title>Node Deck</title>
 
     <link href="stylesheets/main.css" rel="stylesheet" type="text/css">
-
-    <script src="app.js"></script>
 </head>
 <body>
 
@@ -18,7 +16,17 @@
         <p class="subtitle">
             You are in <strong id="env-name"></strong> environment.
         </p>
+        <div id="container"></div>
     </div>
 
+    <!-- build:js scripts/assets.js -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/lodash/dist/lodash.min.js"></script>
+    <script src="bower_components/react/react.js"></script>
+    <script src="bower_components/react/react-dom.js"></script>
+    <!-- endbuild -->
+    
+    <script src="app/example.js"></script>
+    <script src="app/main.js"></script>
 </body>
 </html>
