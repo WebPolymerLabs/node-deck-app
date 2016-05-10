@@ -1,32 +1,98 @@
 <!doctype html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Node Deck</title>
 
-    <link href="stylesheets/main.css" rel="stylesheet" type="text/css">
-</head>
-<body>
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/main.css">
 
-    <div class="container">
-        <h1 id="greet">Hey</h1>
-        <p class="subtitle">
-            Welcome to <a href="http://electron.atom.io" class="js-external-link">Electron</a> app running on this magnificent <strong id="platform-info"></strong> machine.
-        </p>
-        <p class="subtitle">
-            You are in <strong id="env-name"></strong> environment.
-        </p>
-        <div id="container"></div>
-    </div>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        
+        .reg-col-01 {
+            background-color: red;
+        }
+        
+        .reg-col-02 {
+            background-color: cornflowerblue;
+        }
+        
+        .reg-col-03 {
+            background-color: violet;
+        }
+        
+        .reg-col-04 {
+            background-color: yellowgreen;
+        }
+
+        .reg-col-05 {
+            background-color: lightseagreen;
+        }
+        
+        .app-shell {
+            margin: 0px;
+            width: 100%;
+            height: 100%;
+            display: table;
+        }
+        
+        .app-shell > .shell-left-container {
+            height: 100%;
+            width: 200px;
+            display: table-cell;
+        }
+        
+        .app-shell > .shell-main-container {
+            height: 100%;
+            width: 100%;
+            display: block;
+        }
+        
+        .app-shell .shell-header-container {
+            height: 64px;
+            width: 100%;
+        }
+
+        .app-shell > .shell-main-content {
+            height: 100%;
+            width: 100%;
+            display: block;
+        }
+    </style>
 
     <!-- build:js scripts/assets.js -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/lodash/dist/lodash.min.js"></script>
     <script src="bower_components/react/react.js"></script>
     <script src="bower_components/react/react-dom.js"></script>
+    <script src="bower_components/semantic/dist/semantic.min.js"></script>
     <!-- endbuild -->
-    
-    <script src="app/example.js"></script>
-    <script src="app/main.js"></script>
+</head>
+
+<body>
+    <div class="app-shell reg-col-01">
+        <div class="shell-left-container reg-col-02">
+            <div class="shell-header-container reg-col-04">
+            </div>
+        </div>
+        <div class="shell-main-container reg-col-03">
+            <div class="shell-header-container reg-col-04">
+            </div>
+            <div class="shell-main-content reg-col-05">
+            </div>
+        </div>
+    </div>
+    <!-- build:js scripts/app.js -->
+    <script src="appScripts/main.js"></script>
+    <!-- endbuild -->
 </body>
+
 </html>

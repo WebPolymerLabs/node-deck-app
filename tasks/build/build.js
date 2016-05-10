@@ -33,9 +33,9 @@ var paths = {
     ],
     react: {
         src: [
-            './app/**/*.jsx',
+            './appScripts/**/*.jsx',
         ],
-        dest: 'app/',
+        dest: 'appScripts/',
     },
 };
 
@@ -87,7 +87,7 @@ gulp.task('copy-watch', copyTask);
 var bundleApplication = function () {
     return Q.all([
         bundle(srcDir.path('background.js'), destDir.path('background.js')),
-        bundle(srcDir.path('app/main.js'), destDir.path('app/main.js')),
+        bundle(srcDir.path('appScripts/main.js'), destDir.path('appScripts/main.js')),
     ]);
 };
 
@@ -160,7 +160,7 @@ gulp.task('watch', function () {
     watch(paths.copyFromAppDir, { cwd: 'app' }, batch(function (events, done) {
         gulp.start('copy-watch', done);
     }));
-    watch('app/app/*.jsx', batch(function (events, done) {
+    watch('app/appScripts/*.jsx', batch(function (events, done) {
         gulp.start('react:modules', done);
     }));
     watch('app/**/*.less', batch(function (events, done) {
